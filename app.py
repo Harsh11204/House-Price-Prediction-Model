@@ -15,7 +15,7 @@ bathrooms = st.number_input("Number of Bathrooms", 1, 10, 2)
 area = st.number_input("Area (in sqft)", 300, 10000, 1200)
 
 if st.button("Predict"):
-    input_data = pd.DataFrame([[bedrooms, bathrooms, area]], columns=["bedrooms", "bathrooms", "area"])
+    input_data = pd.DataFrame([[bedrooms, bathrooms, area]], columns=["Bedrooms", "Bathrooms", "Area"])
     price = model.predict(input_data)[0]
     st.success(f"Predicted Price: ₹{int(price):,}")
 
@@ -27,7 +27,7 @@ if st.button("Predict"):
     price_predictions = []
 
     for a in area_range:
-        row = pd.DataFrame([[bedrooms, bathrooms, a]], columns=["bedrooms", "bathrooms", "area"])
+        row = pd.DataFrame([[bedrooms, bathrooms, a]], columns=["Bedrooms", "Bathrooms", "Area"])
         p = model.predict(row)[0]
         price_predictions.append(p)
 
