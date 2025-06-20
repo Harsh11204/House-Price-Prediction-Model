@@ -3,8 +3,9 @@ import pandas as pd
 import numpy as np
 import pickle
 
-# Load trained model
+# Load trained model and scaler
 model = pickle.load(open('model.pkl', 'rb'))
+scaler = pickle.load(open('scaler.pkl', 'rb'))
 
 st.set_page_config(page_title="House Price Prediction", layout="centered")
 
@@ -16,14 +17,16 @@ bedrooms = st.number_input("Number of Bedrooms", min_value=1, max_value=10, valu
 bathrooms = st.number_input("Number of Bathrooms", min_value=1, max_value=10, value=2)
 area = st.number_input("Area (in sqft)", min_value=300, max_value=10000, value=1200)
 
-# Predict Button
 if st.button("Predict"):
-    # IMPORTANT: Match column names and order exactly with training
     input_data = pd.DataFrame([[area, bathrooms, bedrooms]], columns=["Area", "Bathrooms", "Bedrooms"])
-    predicted_price = model.predict(input_data)[0]
+    
+    # **IMPORTANT: Apply scaling BEFORE prediction**
+    input_scaled = scaler.transform(input_data)
+    
+    predicted_price = model.predict(input_scaled)[0]
     st.success(f"Predicted Price: ₹{int(predicted_price):,}")
 
-    # Price vs Area Chart
+    # Price vs Area Chart (keeping bedrooms & bathrooms fixed)
     st.subheader("📈 Price vs Area (keeping Bedrooms & Bathrooms fixed)")
 
     area_range = np.arange(500, 3001, 100)
@@ -31,7 +34,8 @@ if st.button("Predict"):
 
     for a in area_range:
         row = pd.DataFrame([[a, bathrooms, bedrooms]], columns=["Area", "Bathrooms", "Bedrooms"])
-        price = model.predict(row)[0]
+        row_scaled = scaler.transform(row)
+        price = model.predict(row_scaled)[0]
         prices.append(price)
 
     chart_data = pd.DataFrame({
